@@ -1,60 +1,42 @@
 from pandas_datareader import data as pdr
 import yfinance as yfin
 
+class TickerDownloader():
 
-class Stock():
-
-    AVG_YEARLY_TRADING_DAYS = 252
-    VOLATILITY_INDEXES = {"S&P":"^VIX","NASDAQ":"^VXN","DOW":"^VXD","RUS":"^RVX"}
-    STOCK_INDEXES = {"S&P":"^GSPC","NASDAQ":"^IXIC","DOW":"^DJI","RUS":"^RUT"}
-
-    def __init__(self, ticker):
-
-        #create variable for ticker
-        self.ticker = ticker
+    def download_data(self, ticker):
 
         #make pandas datareader work with yahoo finance
         yfin.pdr_override()
-
-        #if ticker is not valid, return an error
-        if self.__valid_ticker() == False:
-            raise ValueError("Entered ticker symbol not valid")
         
-        self.price_data = pdr.get_data_yahoo(self.ticker,actions=True)
-        
-        #check if ticker is an etf and if it pays dividends and remove unalike column
-        self.isETF = self.__etf_check()
-        if self.isETF:
-            self.price_data = self.price_data.drop(columns=["Capital Gains"])
-        
-        #generate the dataframes
-        self.price_data = self.__generate_price_frame()
-        self.pays_dividend = not self.price_data[(self.price_data["Dividends"] > 0)].empty
-        if self.pays_dividend == True:
-            self.dividend_data,self.div_payments_yearly = self.__generate_div_frame()
-
-
-    
-    #returns whether ticker exists or not
-    def __valid_ticker(self):
         try:
-            test = pdr.get_data_yahoo(self.ticker,actions=True)
+            test = pdr.get_data_yahoo(ticker,actions=True)
+        #if dataframe could not be made
         except:
-            return False
+            return ValueError("Value entered is not a valid ticker symbol")
         else:
+            #if dataframe returned was empty
             if test.empty:
-                return False
+                return ImportError("No values available for the ticker symbol")
             else:
-                return True
-    
-    #check if ticker is an ETF or not
-    def __etf_check(self):
-        try:
-            self.price_data.drop(columns=["Capital Gains"])
-        except:
-            return False
+                return test
+
+class Ticker(TickerDownloader):
+
+    def __init__(self, ticker):
+        super().__init__()
+        self.ticker = ticker
+        self.price_data = self.download_data(ticker)
+        self.price_data = self.__generate_price_frame()
+
+        # checks if symbol is etf
+        self.pays_dividend = not self.price_data[(self.price_data["Dividends"] > 0)].empty
+        if self.__is_ETF():
+            self.__class__ = Etf
         else:
-            return True
+            self.__class__ = Stock
+   
+    def __str__(self):
+        return f"TICKER: {self.ticker}"
     
     #generate the price dataframe
     def __generate_price_frame(self):
@@ -65,8 +47,40 @@ class Stock():
         df["Adj Close"] = df["Adj Close"].round(2)
 
         return df
+            
+    def __is_ETF(self):
+        try:
+            self.price_data.drop(columns=["Capital Gains"])
+        except:
+            return False
+        else:
+            return True
 
-    #generate dividend dataframe
+class Etf(Ticker):
+    def __init__(self, ticker):
+        super().__init__(ticker)
+
+        # ETF specific checks and cleaning
+        self.price_data = self.price_data.drop(columns=["Capital Gains"])
+
+        if self.pays_dividend:
+            self.__class__ = DividendEtf
+
+class Stock(Ticker):
+    def __init__(self, ticker):
+        super().__init__(ticker)
+
+        if self.pays_dividend:
+            self.__class__ = DividendStock
+
+class Dividend(Ticker):
+    def __init__(self, ticker):
+        super().__init__(ticker)
+
+        # Identify dividend payers and calculate related data
+        self.dividend_data,self.div_payments_yearly = self.__generate_div_frame()
+
+        #generate dividend dataframe
     def __generate_div_frame(self):
 
         #filter out all rows without dividend payments
@@ -97,21 +111,33 @@ class Stock():
 
         return df,div_payments_yearly
 
-    #generates data for CAGR on series passed in
-    def __cagr(self):
+class DividendEtf(Etf,Dividend):
+    def __init__(self, ticker):
+        super().__init__(ticker)
+        Dividend.__init__(ticker)
+
+class DividendStock(Stock,Dividend):
+    def __init__(self, ticker):
+        super().__init__(ticker)
+        Dividend.__init__(ticker)
+
+class StockAnalysis:
+    #useful stock metrics
+    AVG_YEARLY_TRADING_DAYS = 252
+    VOLATILITY_INDEXES = {"S&P":"^VIX","NASDAQ":"^VXN","DOW":"^VXD","RUS":"^RVX"}
+    STOCK_INDEXES = {"S&P":"^GSPC","NASDAQ":"^IXIC","DOW":"^DJI","RUS":"^RUT"}
+    def __init__(self, stock_data):
+        self.stock_data = stock_data
+
+    def calculate_cagr(self):
+        # Implement CAGR calculation
         pass
-    
 
-    def __comparison_metrics(self):
+    def comparison_metrics(self):
+        # Implement comparison metrics calculation
         pass
 
-    def __str__(self):
-        return f"TICKER: {self.ticker}"
-
-
-
-
-tick = Stock("^VIX")
-print(tick.price_data["Adj Close"].median())
+tick = Ticker("JEPQ")
+print(tick.__class__)
 
 
