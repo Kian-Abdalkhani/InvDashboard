@@ -1,6 +1,4 @@
-"""
-file is so tests can use files in the parent directory
-"""
+"""file is so tests can use files in the parent directory"""
 
 import os
 import sys
