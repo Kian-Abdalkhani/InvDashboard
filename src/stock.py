@@ -1,87 +1,65 @@
-from pandas_datareader import data as pdr
-import yfinance as yfin
+"""
+file that has all the different types of ticker symbols that are publicly traded
 
-class TickerDownloader():
+"""
+import pandas as pd
+import ticker_data_handler as tdh
+from dataclasses import dataclass
+import datetime as dt
 
-    def download_data(self, ticker):
 
-        #make pandas datareader work with yahoo finance
-        yfin.pdr_override()
-        
-        try:
-            test = pdr.get_data_yahoo(ticker,actions=True)
-        #if dataframe could not be made
-        except:
-            return ValueError("Value entered is not a valid ticker symbol")
-        else:
-            #if dataframe returned was empty
-            if test.empty:
-                return ImportError("No values available for the ticker symbol")
-            else:
-                return test
 
-class Ticker(TickerDownloader):
+@dataclass
+class TickerData:
+    """Represents processed price data for a ticker."""
+    data: pd.DataFrame
 
-    def __init__(self, ticker):
-        super().__init__()
-        self.ticker = ticker
-        self.price_data = self.download_data(ticker)
-        self.price_data = self.__generate_price_frame()
+    def __post_init__(self):
+        self.data = self.__generate_price_frame(self.data)
 
-        # checks if symbol is etf
-        self.pays_dividend = not self.price_data[(self.price_data["Dividends"] > 0)].empty
-        if self.__is_ETF():
-            self.__class__ = Etf
-        else:
-            self.__class__ = Stock
-   
-    def __str__(self):
-        return f"TICKER: {self.ticker}"
+    @staticmethod
+    def __generate_price_frame(data):
+
+        data = data.drop(columns=["Stock Splits", "Open", "High", "Low", "Close"])
+        data["Adj Close"] = data["Adj Close"].round(2)
+        return data
+
+
+class Ticker:
+    def __init__(self, ticker: str, pays_dividends: bool = False,is_etf: bool = True):
+        self.ticker: str = ticker
+        self.pays_dividends: bool = False
+        self.is_etf: bool = True
+        self.price_data = TickerData(tdh.download_data(ticker)).data
     
-    #generate the price dataframe
-    def __generate_price_frame(self):
-
-        #drop unecessary columns and round adjusted close to the nearest cent
-        df = self.price_data.drop(columns=["Stock Splits","Open",
-                                             "High","Low","Close"])
-        df["Adj Close"] = df["Adj Close"].round(2)
-
-        return df
-            
-    def __is_ETF(self):
-        try:
-            self.price_data.drop(columns=["Capital Gains"])
-        except:
-            return False
-        else:
-            return True
+    def __str__(self):
+        return f"--{self.ticker}-- \n Dividends: {self.pays_dividends}"
+    
 
 class Etf(Ticker):
-    def __init__(self, ticker):
+    def __init__(self, ticker: str):
         super().__init__(ticker)
-
+        
+        self.is_etf = True
+        
         # ETF specific checks and cleaning
         self.price_data = self.price_data.drop(columns=["Capital Gains"])
-
-        if self.pays_dividend:
-            self.__class__ = DividendEtf
+        
 
 class Stock(Ticker):
-    def __init__(self, ticker):
+    def __init__(self, ticker: str):
         super().__init__(ticker)
-
-        if self.pays_dividend:
-            self.__class__ = DividendStock
+        
+        self.is_etf: bool = False
 
 class Dividend(Ticker):
-    def __init__(self, ticker):
+    def __init__(self, ticker: str):
         super().__init__(ticker)
+        
+        self.pays_dividends = True
+        self.dividend_data,self.div_payments_yearly = self.__generate_div_frame__()
 
-        # Identify dividend payers and calculate related data
-        self.dividend_data,self.div_payments_yearly = self.__generate_div_frame()
-
-        #generate dividend dataframe
-    def __generate_div_frame(self):
+    def __generate_div_frame__(self) -> tuple[pd.DataFrame, int]:
 
         #filter out all rows without dividend payments
         df = self.price_data[(self.price_data["Dividends"] > 0)]
@@ -91,7 +69,8 @@ class Dividend(Ticker):
         df["Days Between"] = df.index.diff()
         avg_days = df["Days Between"].median()
         avg_days = avg_days.days
-
+        div_payments_yearly = 0
+        
         #monthly
         if avg_days <= 70:
             div_payments_yearly = 12
@@ -111,33 +90,22 @@ class Dividend(Ticker):
 
         return df,div_payments_yearly
 
-class DividendEtf(Etf,Dividend):
-    def __init__(self, ticker):
+class DividendEtf(Dividend,Etf):
+    def __init__(self, ticker: str):
+        super().__init__(ticker) 
+        Etf(ticker).__init__(ticker)
+        
+
+class DividendStock(Dividend,Stock):
+    def __init__(self, ticker: str):
         super().__init__(ticker)
-        Dividend.__init__(ticker)
-
-class DividendStock(Stock,Dividend):
-    def __init__(self, ticker):
-        super().__init__(ticker)
-        Dividend.__init__(ticker)
-
-class StockAnalysis:
-    #useful stock metrics
-    AVG_YEARLY_TRADING_DAYS = 252
-    VOLATILITY_INDEXES = {"S&P":"^VIX","NASDAQ":"^VXN","DOW":"^VXD","RUS":"^RVX"}
-    STOCK_INDEXES = {"S&P":"^GSPC","NASDAQ":"^IXIC","DOW":"^DJI","RUS":"^RUT"}
-    def __init__(self, stock_data):
-        self.stock_data = stock_data
-
-    def calculate_cagr(self):
-        # Implement CAGR calculation
-        pass
-
-    def comparison_metrics(self):
-        # Implement comparison metrics calculation
-        pass
-
-tick = Ticker("JEPQ")
-print(tick.__class__)
+        Stock(ticker).__init__(ticker)
+        
+    
+def main() -> None:
+    pass
+    
+if __name__ == "__main__":
+    main()
 
 

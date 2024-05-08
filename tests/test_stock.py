@@ -1,5 +1,6 @@
+# import setup_path
 import unittest
-from src.stock import Stock
+from src import stock
 
 class TestStock(unittest.TestCase):
     AVG_YEARLY_TRADING_DAYS = 252
