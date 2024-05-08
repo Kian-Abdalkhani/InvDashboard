@@ -1,1 +1,1 @@
-# InvestmentDashboard
+# InvDashboard
