@@ -3,41 +3,13 @@ file that has all the different types of ticker symbols that are publicly traded
 
 """
 import pandas as pd
-import ticker_data_handler as tdh
-from dataclasses import dataclass
-import atexit
+from ticker_data_handler import Ticker
 
-@dataclass
-class TickerData:
-    """Represents processed price data for a ticker."""
-    data: pd.DataFrame
-
-    def __post_init__(self):
-        self.data = self.__generate_price_frame(self.data)
-
-    @staticmethod
-    def __generate_price_frame(data: pd.DataFrame):
-
-        data = data.drop(columns=["Stock Splits", "Open", "High", "Low", "Close"])
-        data["Adj Close"] = data["Adj Close"].round(2)
-        return data
-
-
-class Ticker:
-    def __init__(self, ticker: str, pays_dividends: bool = False,is_etf: bool = True):
-        self.ticker: str = ticker
-        self.pays_dividends: bool = False
-        self.is_etf: bool = True
-        self.price_data = TickerData(tdh.download_data(ticker)).data
-    
-    def __str__(self):
-        return f"--{self.ticker}-- \n Dividends: {self.pays_dividends}"
-    
 
 class Etf(Ticker):
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         super().__init__(ticker)
-        self.is_etf = True
+        
         self.dividend_data: pd.DataFrame = pd.DataFrame()
         self.div_payments_yearly: int = 0
         
@@ -46,17 +18,17 @@ class Etf(Ticker):
         
 
 class Stock(Ticker):
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         super().__init__(ticker)
-        self.is_etf: bool = False
+        
         self.dividend_data: pd.DataFrame = pd.DataFrame()
         self.div_payments_yearly: int = 0
 
 class Dividend(Ticker):
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         super().__init__(ticker)
         
-        self.pays_dividends = True
+        
         self.dividend_data: pd.DataFrame
         self.div_payments_yearly: int
         self.dividend_data,self.div_payments_yearly = self.__generate_div_frame__()
@@ -93,31 +65,27 @@ class Dividend(Ticker):
         return df,div_payments_yearly
 
 class DividendEtf(Dividend,Etf):
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         super().__init__(ticker) 
         Etf(ticker).__init__(ticker)
         
 class DividendStock(Dividend,Stock):
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         super().__init__(ticker)
         Stock(ticker).__init__(ticker)
 
 def id_ticker(ticker: str):
     '''class uses ticker_data_handler and the ticker to determine the type of investment'''
-    tick_id = tdh.download_data(ticker)
-    if tdh.etf(tick_id):
-        return DividendEtf(ticker=ticker) if tdh.pays_dividends(tick_id) else Etf(ticker=ticker)
+    tick_id = Ticker(ticker)
+    if tick_id.isETF:
+        return DividendEtf(ticker=ticker) if tick_id.pays_dividend else Etf(ticker=ticker)
     else:
-         return DividendStock(ticker=ticker) if tdh.pays_dividends(tick_id) else Stock(ticker=ticker)
-
-#
-@atexit.register        
-def clear_cache():
-    '''ensures cache is clear at the end of every run'''
-    tdh.download_data.cache_clear()
+        return DividendStock(ticker=ticker) if tick_id.pays_dividend else Stock(ticker=ticker)
     
 def main() -> None:
-    pass
+    test = id_ticker("VIXM")
+    print(isinstance(test,Etf))
+    
       
 if __name__ == "__main__":
     main()
