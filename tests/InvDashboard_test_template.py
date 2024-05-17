@@ -1,6 +1,4 @@
-import setup_path
 import unittest
-from src import stock
 
 class BaseTestClass(unittest.TestCase):
 

@@ -1,6 +1,10 @@
-import setup_path
+# import setup_path
 import unittest
-from stock import id_ticker,Etf,Stock,DividendEtf,DividendStock
+from stock import (DividendEtf,
+                   Etf,
+                   DividendStock,
+                   Stock,
+                   id_ticker)
 
     
 class IdentifierTest(unittest.TestCase):

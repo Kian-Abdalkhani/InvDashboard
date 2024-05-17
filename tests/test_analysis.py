@@ -1,6 +1,5 @@
-import setup_path
 import unittest
-import src.analysis
+import analysis
 
 class BaseTestClass(unittest.TestCase):
 

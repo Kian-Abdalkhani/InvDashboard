@@ -1,7 +1,5 @@
-"""
-file that has all the different types of ticker symbols that are publicly traded
+'''file that has all the different types of ticker symbols that are publicly traded'''
 
-"""
 import pandas as pd
 from ticker_data_handler import Ticker
 

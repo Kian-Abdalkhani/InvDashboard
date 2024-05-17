@@ -2,7 +2,6 @@ from pandas_datareader import data as pdr
 import yfinance as yfin
 import pandas as pd
 from functools import lru_cache
-import atexit
 
 class Ticker:
     """Analyzes data received from yfinance to identify key characteristics of the ticker"""
@@ -43,7 +42,10 @@ class Ticker:
             else:
                 df = df.drop(columns=["Stock Splits", "Open", "High", "Low", "Close"])
                 df["Adj Close"] = df["Adj Close"].round(2)
-                return df
+                if type(df) == pd.DataFrame:
+                    return df
+                else:
+                    raise ValueError("Data received from API appears to be improperly formatted")
             
     @lru_cache()
     def dividends(self) -> bool:

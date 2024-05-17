@@ -1,4 +1,3 @@
-import setup_path
 import unittest
 from ticker_data_handler import Ticker
 
