@@ -1,46 +1,18 @@
 import unittest
-import analysis
+from analysis import calculate_cagr
+from id_stock import id_ticker
 
-class BaseTestClass(unittest.TestCase):
+class TestAnalysis(unittest.TestCase):
 
-    def setUp(self):
-        # Code that runs before each test (common setup)
-        pass
+    def test_cagr(self):
+        
+        tick = id_ticker("SCHD")
+        test = calculate_cagr(tick.dividendData["Year Dividend Payment"],3)
+        
+        self.assertIsInstance(test,float,"calculate_cagr function should always return a float")
+        self.assertGreaterEqual(test,0,f"{tick.ticker} should always return dividend growth >0")
     
-class Test(BaseTestClass):
 
-    @classmethod
-    def setUpClass(cls):
-        # Code that runs once before all tests (e.g., connect to a database)
-        pass
-
-    def setUp(self):
-        # Initialize objects or variables used in your tests here.
-        # This method runs before each test case.
-        #symbols to run tests on
-        pass
-
-    def tearDown(self):
-        # Clean up any resources used in your tests here.
-        # This method runs after each test case.
-        pass
-
-    def test_function_name(self):
-        """
-        This docstring describes what your test case is verifying.
-
-        Args:
-        self: The test case object.
-        """
-        # Arrange (Set up the test data and conditions)
-        # Act (Call the function or method you're testing)
-        # Assert (Verify the expected outcome using assertions)
-
-        # # Example: Test if a function adds numbers correctly
-        # expected_result = 10
-        # actual_result = your_function(5, 5)
-        # self.assertEqual(expected_result, actual_result)
-        pass
 
 
 
