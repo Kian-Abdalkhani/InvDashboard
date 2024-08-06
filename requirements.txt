@@ -5,6 +5,7 @@ charset-normalizer==3.3.2
 frozendict==2.4.4
 html5lib==1.1
 idna==3.7
+-e git+https://github.com/Kian-Abdalkhani/InvDashboard.git@10415c21fc63c2672a6310faf45e35668b6edf37#egg=inv_dashboard
 lxml==5.2.1
 multitasking==0.0.11
 numpy==1.26.4
@@ -19,4 +20,5 @@ soupsieve==2.5
 tzdata==2024.1
 urllib3==2.2.1
 webencodings==0.5.1
+yahoofinance==0.0.2
 yfinance==0.2.38
