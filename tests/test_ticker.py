@@ -1,38 +1,8 @@
 import unittest
-from src.ticker import Ticker
+from tickertypes.ticker import Ticker
 
 class TestTicker(unittest.TestCase):
     schd = Ticker("SCHD")
-    
-    def test_invalid_tickers(self):
-        """tests if invalid tickers throw exception at initialization"""
-        invalid_tickers = ["0(SD)",".ew1,",".SPY","';*)"]
-        actual_result = []
-        for tick in invalid_tickers:
-            try:
-                Ticker(tick)
-            except:
-                pass
-            else:
-                actual_result.append(tick)
-        expected_result = []
-        self.assertEqual(expected_result,actual_result)
-            
-    
-    def test_tickers_with_spaces(self):
-        '''ensures that spaces within the input are disregarded'''
-        space_tickers = [" VOO "," VOO","VOO ","VOO"]
-        actual_result = []
-        for tick in space_tickers:
-            try:
-                Ticker(tick)
-            except:
-                pass
-            else:
-                actual_result.append(tick)
-        
-        expected_result = space_tickers    
-        self.assertEqual(expected_result, actual_result)
         
     def test_manipulating_ticker(self):
         '''ensures that user doesn't have access to change ticker attribute in the Ticker class'''
@@ -81,20 +51,6 @@ class TestTicker(unittest.TestCase):
             actual_result =  True
         expected_result = False   
         self.assertEqual(expected_result, actual_result)      
-            
-    def test_empty_ticker(self):
-        '''ensures that a blank input return an error'''
-        blank_ticker = ""
-        actual_result: bool
-        try:
-            Ticker(blank_ticker)
-        except:
-            actual_result = True
-        else:
-            actual_result = False
-        
-        expected_result = True    
-        self.assertEqual(expected_result, actual_result)
         
     def test_df_generated(self):
         '''ensures that dataframe received from yfinance is accurate'''

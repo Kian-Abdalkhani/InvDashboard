@@ -1,8 +1,8 @@
 import unittest
-from src import Etf,Ticker
+from tickertypes.etf import Etf
 
 class TestEtf(unittest.TestCase):
-    tick = Etf(Ticker("UVXY"))
+    pass
 
 
 if __name__ == '__main__':

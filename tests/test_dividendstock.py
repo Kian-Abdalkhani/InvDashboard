@@ -1,8 +1,8 @@
 import unittest
-from src import DividendStock,Ticker
+from tickertypes.dividendstock import DividendStock
 
 class TestDividendStock(unittest.TestCase):
-    tick = DividendStock(Ticker("BAC"))
+    pass
 
 
 if __name__ == '__main__':

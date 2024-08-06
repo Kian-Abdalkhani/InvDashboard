@@ -1,8 +1,8 @@
 import unittest
-from src import DividendEtf,Ticker
+from tickertypes.dividendetf import DividendEtf
 
 class TestDividendEtf(unittest.TestCase):
-    tick = DividendEtf(Ticker("SCHD"))
+    pass
 
 if __name__ == '__main__':
   unittest.main()

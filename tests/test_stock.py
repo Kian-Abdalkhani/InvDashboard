@@ -1,8 +1,8 @@
 import unittest
-from src import Stock,Ticker
+from tickertypes.stock import Stock
 
 class TestStock(unittest.TestCase):
-    tick = Stock(Ticker("GME"))
+    pass
 
 
 if __name__ == '__main__':
