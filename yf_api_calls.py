@@ -58,19 +58,20 @@ def __fetch_yf_expense_ratio_data__(ticker:str) -> float:
     soup = BeautifulSoup(response.text,"html.parser")
     
     value = 0.0
-    for li in soup.find_all('li', class_="last-md yf-tx3nkj"):
+    for li in soup.find_all('li', class_="last-md yf-dudngy"):
         if "Expense Ratio (net)" in li.text.strip():
-            for value_element in li.find_all('span', class_="value yf-tx3nkj"):
+            for value_element in li.find_all('span', class_="value yf-dudngy"):
                 exp_ratio = value_element.text.strip().replace("%","")
                 value = float(exp_ratio)
 
     return value
 
 def main():
-    __fetch_yf_fin_data__("AAPL")
+    pass
 
 if __name__ == "__main__":
     main()
             
-'''make sure that this code also:
+'''
+make sure that this code also:
 '''
