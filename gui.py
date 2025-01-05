@@ -19,28 +19,6 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QtCore.QSize(250, 175))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(20, 10, 121, 21))
-        self.label.setObjectName("label")
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(150, 10, 61, 22))
-        self.lineEdit.setObjectName("lineEdit")
-        
-        self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.checkBox.setGeometry(QtCore.QRect(20, 60, 131, 16))
-        self.checkBox.setObjectName("price_checkBox")
-        self.checkBox_2 = QtWidgets.QCheckBox(self.centralwidget)
-        self.checkBox_2.setGeometry(QtCore.QRect(20, 40, 141, 16))
-        self.checkBox_2.setObjectName("div_checkBox")
-        
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(20, 100, 100, 26))
-        self.pushButton.setObjectName("clear_pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(120, 100, 100, 26))
-        self.pushButton_2.setObjectName("download_pushButton")
-        
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 250, 21))
@@ -49,7 +27,31 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
+        
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(20, 10, 121, 21))
+        self.label.setObjectName("label")
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(150, 10, 61, 22))
+        self.lineEdit.setObjectName("lineEdit")
+        
+        self.price_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.price_checkBox.setGeometry(QtCore.QRect(20, 60, 140, 16))
+        self.price_checkBox.setObjectName("price_checkBox")
+        self.div_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.div_checkBox.setGeometry(QtCore.QRect(20, 40, 140, 16))
+        self.div_checkBox.setObjectName("div_checkBox")
+        
+        self.clear_pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.clear_pushButton.setGeometry(QtCore.QRect(20, 100, 100, 26))
+        self.clear_pushButton.setObjectName("clear_pushButton")
+        self.download_pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.download_pushButton.setGeometry(QtCore.QRect(120, 100, 100, 26))
+        self.download_pushButton.setObjectName("download_pushButton")
+        
+        self.clear_pushButton.clicked.connect(self.clear)
+        self.download_pushButton.clicked.connect(self.download)
+        
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -57,17 +59,21 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         MainWindow.setAccessibleDescription(_translate("MainWindow", "i.e. AAPL"))
-        self.checkBox.setText(_translate("MainWindow", "Dividend History"))
+        self.div_checkBox.setText(_translate("MainWindow", "Dividend History"))
         self.label.setText(_translate("MainWindow", "Enter Ticker Symbol:"))
-        self.checkBox_2.setText(_translate("MainWindow", "Stock Price History"))
-        self.pushButton.setText(_translate("MainWindow", "Clear"))
-        self.pushButton_2.setText(_translate("MainWindow", "Download"))
+        self.price_checkBox.setText(_translate("MainWindow", "Stock Price History"))
+        self.clear_pushButton.setText(_translate("MainWindow", "Clear"))
+        self.download_pushButton.setText(_translate("MainWindow", "Download"))
 
     def download(self):
-        pass
+        if self.price_checkBox.isChecked():
+            print("Download price history data")
+        if self.div_checkBox.isChecked():
+            print("Download dividend history data")
     
     def clear(self):
-        pass
+        self.lineEdit.clear()
+        
 
 if __name__ == "__main__":
     import sys
