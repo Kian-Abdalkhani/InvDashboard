@@ -5,8 +5,7 @@ from id_stock import id_ticker
 def main() -> None:
     
     #id the type of ticker input
-    tick = id_ticker("AAPL")
-    print(tick.dividend_yield)
+    pass
     
     '''items that should be able to be returned for analysis are:
             - Price Data: Close, Volume, CAGR statistics for price and/or Dividends(if any)
